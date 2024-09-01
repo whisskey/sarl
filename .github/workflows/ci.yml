@@ -1,0 +1,106 @@
+name: "CI"
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - "main"
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  lint:
+    strategy:
+      fail-fast: true
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Soldeer Update
+        run: |
+          forge soldeer update
+
+      - name: Run Forge build
+        run: |
+          forge fmt --check
+        id: lint
+
+  build:
+    strategy:
+      fail-fast: true
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Soldeer Update
+        run: |
+          forge soldeer update
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+  test:
+    strategy:
+      fail-fast: true
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Soldeer Update
+        run: |
+          forge soldeer update
+
+      - name: Run Forge tests
+        run: |
+          forge test -vvv
+        id: test
+
+  slither-analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.4.0
+        id: slither
+        with:
+          fail-on: none
+          sarif: results.sarif
+          slither-args: --filter-paths "./dependencies|./test"
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}
