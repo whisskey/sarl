@@ -96,11 +96,5 @@ jobs:
         uses: crytic/slither-action@v0.4.0
         id: slither
         with:
-          fail-on: none
-          sarif: results.sarif
+          fail-on: all
           slither-args: --filter-paths "./dependencies|./test"
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{ steps.slither.outputs.sarif }}
