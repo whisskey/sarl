@@ -3,9 +3,7 @@ pragma solidity >=0.8.26 <0.9.0;
 
 import { Broadcaster } from "./Broadcaster.s.sol";
 import { Environment } from "./Environment.s.sol";
-import { console2 } from "forge-std/src/console2.sol";
 
-import { Foo } from "../src/Foo.sol";
 import { WETH } from "solady/src/tokens/WETH.sol";
 
 contract Deploy is Broadcaster, Environment {
@@ -14,7 +12,7 @@ contract Deploy is Broadcaster, Environment {
     function run() public broadcast returns (DeploymentResult memory) {
         DeploymentMode mode = getDeploymentMode();
 
-        result.foo = address(new Foo());
+        result.foo = address(uint160(uint256(keccak256("Sarl"))));
 
         if (mode == DeploymentMode.Test) {
             address mockWeth = address(new WETH());
