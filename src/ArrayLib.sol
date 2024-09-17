@@ -3,14 +3,14 @@ pragma solidity >=0.8.26;
 
 type Array is bytes32;
 
-using LibArray for Array global;
+using ArrayLib for Array global;
 
 /// @notice Library for optimized dynamic arrays and operations for dynamic arrays.
 /// @author whisskey (https://github.com/whisskey/sarl)
 ///
 /// @dev Note: Managing memory allocation, array length and capacity in dynamic arrays can significantly reduce gas
 /// consumption and mitigate performance issues during array operations.
-library LibArray {
+library ArrayLib {
     /**
      *                     +-----------------------------+
      *                     |           Memory            |
