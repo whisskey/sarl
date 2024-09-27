@@ -28,6 +28,19 @@ library DynamicArrayLib {
     uint256 internal constant MASK_128 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
+    /*                        CUSTOM  ERRORS                        */
+    /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
+
+    /// @notice The index does not exist.
+    error IndexDoesNotExist();
+    /// @notice The array is empty.
+    error EmptyArray();
+    /// @notice Thrown when an index is out of bounds.
+    error OutOfBounds();
+    /// @notice Thrown when the provided bounds are invalid.
+    error InvalidBounds();
+
+    /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
     /*                      LIBRARY OPERATIONS                      */
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
 
