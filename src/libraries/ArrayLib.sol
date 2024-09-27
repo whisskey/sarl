@@ -10,6 +10,15 @@ pragma solidity >=0.8.27;
 /// overflows.
 library ArrayLib {
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
+    /*                        CUSTOM  ERRORS                        */
+    /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
+
+    /// @notice Thrown when an index is out of bounds.
+    error OutOfBounds();
+    /// @notice Thrown when the provided bounds are invalid.
+    error InvalidBounds();
+
+    /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
     /*                      UINT256 OPERATIONS                      */
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
 
