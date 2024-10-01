@@ -22,7 +22,7 @@ using DynamicArrayLib for Array global;
 /// and ensuring dynamic resizing.
 library DynamicArrayLib {
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
-    /*                      CONSTANTS                               */
+    /*                          CONSTANTS                           */
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
 
     uint256 internal constant MASK_128 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
