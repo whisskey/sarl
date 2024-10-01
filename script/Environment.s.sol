@@ -2,7 +2,6 @@
 pragma solidity >=0.8.26 <0.9.0;
 
 import { Script } from "forge-std/src/Script.sol";
-import { console2 } from "forge-std/src/console2.sol";
 
 abstract contract Environment is Script {
     /// @dev Deployment modes which are defined according to .env file.
