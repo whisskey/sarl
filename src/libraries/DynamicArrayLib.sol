@@ -826,19 +826,18 @@ library DynamicArrayLib {
     /// @return f A boolean indicating whether the value was found (true) or not (false).
     function unSortedSearch(Array a, uint256 e) internal pure returns (uint256 i, bool f) {
         assembly ("memory-safe") {
-            let b := add(a, 0x20)
             // Address of the element just past the last element in the array
-            let ep := add(b, shl(5, and(mload(a), MASK_128)))
-            let t := b
+            let ep := add(a, shl(5, and(mload(a), MASK_128)))
+            let t := a
             for { } 1 { } {
-                if gt(t, ep) { break }
-                // If a match is found, calculate the index
+                t := add(t, 0x20)
                 if eq(mload(t), e) {
-                    i := shr(5, sub(t, b))
+                    // If a match is found, calculate the index
+                    i := shr(5, sub(t, add(a, 0x20)))
                     f := 1
                     break
                 }
-                t := add(t, 0x20)
+                if iszero(lt(t, ep)) { break }
             }
         }
     }
