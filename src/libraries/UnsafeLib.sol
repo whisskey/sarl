@@ -11,7 +11,7 @@ import "./DynamicArrayLib.sol";
 /// memory corruption.
 library UnsafeLib {
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
-    /*                  DYNAMIC ARRAY OPERATIONS                    */
+    /*                  DYNAMICARRAYLIB OPERATIONS                  */
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
 
     /// @dev Retrieves a pointer to an element at the specified index in the array.
@@ -145,7 +145,7 @@ library UnsafeLib {
         assembly ("memory-safe") {
             // Get the current length of the array (first 128 bits)
             let n := and(mload(a), sub(shl(128, 1), 1))
-            result := mload(add(a, add(a, shl(5, n))))
+            result := mload(add(a, shl(5, n)))
             // Do not pop anything
             mstore(a, or(shl(128, shr(128, mload(a))), sub(n, iszero(iszero(n)))))
         }
