@@ -952,8 +952,8 @@ library DynamicArrayLib {
         }
     }
 
-    /// @dev Converts a standard `bool[]` array into a custom `Array` format.
-    /// @param a The standard `bool[]` array to be converted.
+    /// @dev Converts a standard `bytes32[]` array into a custom `Array` format.
+    /// @param a The standard `bytes32[]` array to be converted.
     /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
     function wrap(bytes32[] memory a) internal pure returns (Array arr) {
         assembly ("memory-safe") {

@@ -374,7 +374,43 @@ library UnsafeLib {
     /// @dev Converts a standard `uint256[]` memory array into a custom array structure (`Array`)
     /// @param a The standard `uint256[]` memory array to convert.
     /// @return arr The converted custom `Array` structure with the length and limit set.
-    function unsafe_flipCustomArr(uint256[] memory a) internal pure returns (Array arr) {
+    function unsafe_wrap(uint256[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := a
+            let n := mload(a)
+            // Update the length and limit in array a
+            mstore(arr, or(shl(128, n), n))
+        }
+    }
+
+    /// @dev Converts a standard `address[]` memory array into a custom array structure (`Array`)
+    /// @param a The standard `address[]` memory array to convert.
+    /// @return arr The converted custom `Array` structure with the length and limit set.
+    function unsafe_wrap(address[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := a
+            let n := mload(a)
+            // Update the length and limit in array a
+            mstore(arr, or(shl(128, n), n))
+        }
+    }
+
+    /// @dev Converts a standard `bool[]` memory array into a custom array structure (`Array`)
+    /// @param a The standard `bool[]` memory array to convert.
+    /// @return arr The converted custom `Array` structure with the length and limit set.
+    function unsafe_wrap(bool[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := a
+            let n := mload(a)
+            // Update the length and limit in array a
+            mstore(arr, or(shl(128, n), n))
+        }
+    }
+
+    /// @dev Converts a standard `bytes32[]` memory array into a custom array structure (`Array`)
+    /// @param a The standard `bytes32[]` memory array to convert.
+    /// @return arr The converted custom `Array` structure with the length and limit set.
+    function unsafe_wrap(bytes32[] memory a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
             arr := a
             let n := mload(a)
