@@ -108,7 +108,7 @@ library ArrayLib {
         assembly ("memory-safe") {
             result := a
             // If the new size (n) is less than the current length, set it to n; otherwise, keep the current length
-            mstore(a, or(mul(lt(n, mload(a)), n), mload(a)))
+            mstore(a, or(mul(lt(n, mload(a)), n), mul(iszero(lt(n, mload(a))), mload(a))))
         }
     }
 
