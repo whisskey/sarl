@@ -162,9 +162,8 @@ library ArrayLib {
     function swap(uint256[] memory a, uint256 i, uint256 j) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
             result := a
-            // Get the length of the array and subtract 1
-            let li := sub(mload(a), 1)
-            if or(gt(i, li), gt(j, li)) {
+            let n := mload(a)
+            if or(iszero(lt(i, n)), iszero(lt(j, n))) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
