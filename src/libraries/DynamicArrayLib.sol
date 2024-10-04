@@ -737,8 +737,9 @@ library DynamicArrayLib {
     /// This method is efficient for cases where the order of elements is not important.
     /// @param a The pointer to the array in memory.
     /// @param i The index of the element to be removed.
-    function removeCheap(Array a, uint256 i) internal pure {
+    function removeCheap(Array a, uint256 i) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             if iszero(lt(i, n)) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
@@ -765,8 +766,9 @@ library DynamicArrayLib {
     /// shifting elements, making it less efficient than other removal methods.
     /// @param a The pointer to the array in memory.
     /// @param i The index of the element to be removed.
-    function removeExpensive(Array a, uint256 i) internal pure {
+    function removeExpensive(Array a, uint256 i) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             if iszero(lt(i, n)) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
@@ -793,8 +795,9 @@ library DynamicArrayLib {
 
     /// @dev Reverses the elements of the array in place.
     /// @param a The pointer to the array in memory that will be reversed.
-    function reverse(Array a) internal pure {
+    function reverse(Array a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             if iszero(lt(n, 2)) {
                 // Calculate the starting pointer
