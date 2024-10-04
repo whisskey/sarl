@@ -141,7 +141,7 @@ library DynamicArrayLib {
             // Last 128 bits: limit
             let lmt := shr(128, data)
             // Size
-            let s := add(shl(5, n), 0x20)
+            let s := add(shl(5, lmt), 0x20)
             let fmp := mload(0x40)
             // Is the new limit smaller than the current limit?
             switch lt(newLmt, lmt)
