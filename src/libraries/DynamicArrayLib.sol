@@ -570,12 +570,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -592,12 +592,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -614,12 +614,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -636,12 +636,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -658,12 +658,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
