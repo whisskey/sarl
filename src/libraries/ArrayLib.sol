@@ -370,9 +370,9 @@ library ArrayLib {
     function slice(uint256[] memory a, uint256 s, uint256 e) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
             result := mload(0x40)
-            let li := sub(mload(a), 1)
-            if or(gt(s, li), or(gt(e, li), gt(s, e))) {
-                mstore(0x00, 0xa8834357) // "InvalidBounds"
+            let n := mload(a)
+            if or(or(iszero(lt(s, n)), iszero(lt(e, n))), iszero(lt(s, e))) {
+                mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
             // Calculate the length of the slice
