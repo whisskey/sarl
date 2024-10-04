@@ -765,7 +765,7 @@ contract DynamicArrayLibTest is SarlTest {
         }
     }
 
-    function test_flipCustomArr() public pure {
+    function test_wrap() public pure {
         unchecked {
             uint256 length = 6;
             uint256[] memory b = new uint256[](length);
@@ -776,12 +776,69 @@ contract DynamicArrayLibTest is SarlTest {
             b[4] = 5;
             b[5] = 6;
 
-            Array arr = DynamicArrayLib.flipCustomArr(b);
+            Array arr = DynamicArrayLib.wrap(b);
 
             _checkMemory(arr);
 
             for (uint256 i; i != length; ++i) {
                 assertEq(arr.get(i), b[i]);
+            }
+
+            assertEq(arr.limit(), length);
+            assertEq(arr.length(), length);
+        }
+    }
+
+    function test_wrap_address() public pure {
+        unchecked {
+            uint256 length = 1;
+            address[] memory b = new address[](length);
+            b[0] = vm.addr(1);
+
+            Array arr = DynamicArrayLib.wrap(b);
+
+            _checkMemory(arr);
+
+            for (uint256 i; i != length; ++i) {
+                assertEq(arr.getAddress(i), b[i]);
+            }
+
+            assertEq(arr.limit(), length);
+            assertEq(arr.length(), length);
+        }
+    }
+
+    function test_wrap_bool() public view {
+        unchecked {
+            uint256 length = 1;
+            bool[] memory b = new bool[](length);
+            b[0] = vm.isPersistent(address(0x1));
+
+            Array arr = DynamicArrayLib.wrap(b);
+
+            _checkMemory(arr);
+
+            for (uint256 i; i != length; ++i) {
+                assertEq(arr.getBool(i), b[i]);
+            }
+
+            assertEq(arr.limit(), length);
+            assertEq(arr.length(), length);
+        }
+    }
+
+    function test_wrap_bytes32() public pure {
+        unchecked {
+            uint256 length = 1;
+            bytes32[] memory b = new bytes32[](length);
+            b[0] = keccak256("sarl");
+
+            Array arr = DynamicArrayLib.wrap(b);
+
+            _checkMemory(arr);
+
+            for (uint256 i; i != length; ++i) {
+                assertEq(arr.getBytes32(i), b[i]);
             }
 
             assertEq(arr.limit(), length);
