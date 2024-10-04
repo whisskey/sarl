@@ -408,20 +408,18 @@ library ArrayLib {
             mstore(result, tn)
             // Byte size of array 'a'
             let bytesNa := shl(5, na)
-            // Byte size of array 'b'
-            let bytesNb := shl(5, nb)
             // Mask
             let w := not(0x1f)
             for { let o := bytesNa } 1 { } {
+                if iszero(o) { break }
                 mstore(add(result, o), mload(add(a, o)))
                 // Move backwards through the byte array
                 o := add(o, w)
-                if iszero(o) { break }
             }
-            for { let o := bytesNb } 1 { } {
+            for { let o := shl(5, nb) } 1 { } {
+                if iszero(o) { break }
                 mstore(add(add(result, bytesNa), o), mload(add(b, o)))
                 o := add(o, w)
-                if iszero(o) { break }
             }
             // Update the free memory pointer to point after the new concatenated array
             mstore(0x40, add(result, shl(5, add(tn, 1))))
