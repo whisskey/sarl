@@ -911,9 +911,9 @@ library DynamicArrayLib {
     function slice(Array a, uint256 s, uint256 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
             arr := mload(0x40)
-            let li := sub(and(mload(a), MASK_128), 1)
-            if or(gt(s, li), or(gt(e, li), gt(s, e))) {
-                mstore(0x00, 0xa8834357) // "InvalidBounds"
+            let n := and(mload(a), MASK_128)
+            if or(or(iszero(lt(s, n)), iszero(lt(e, n))), iszero(lt(s, e))) {
+                mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
             // Calculate the length of the slice
@@ -949,20 +949,18 @@ library DynamicArrayLib {
             mstore(arr, or(shl(128, tn), tn))
             // Byte size of array 'a'
             let bytesNa := shl(5, na)
-            // Byte size of array 'b'
-            let bytesNb := shl(5, nb)
             // Mask
             let w := not(0x1f)
             for { let o := bytesNa } 1 { } {
+                if iszero(o) { break }
                 mstore(add(arr, o), mload(add(a, o)))
                 // Move backwards through the byte array
                 o := add(o, w)
-                if iszero(o) { break }
             }
-            for { let o := bytesNb } 1 { } {
+            for { let o := shl(5, nb) } 1 { } {
+                if iszero(o) { break }
                 mstore(add(add(arr, bytesNa), o), mload(add(b, o)))
                 o := add(o, w)
-                if iszero(o) { break }
             }
             // Update the free memory pointer to point after the new concatenated array
             mstore(0x40, add(arr, shl(5, add(tn, 1))))
