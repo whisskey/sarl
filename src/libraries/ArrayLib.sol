@@ -96,7 +96,7 @@ library ArrayLib {
             let fmp := mload(0x40)
             // If equal, write the array's starting address to 0x40; otherwise, keep the current free pointer
             mstore(0x40, or(mul(eq(fmp, s), a), mul(iszero(eq(fmp, s)), fmp)))
-            codecopy(a, codesize(), shl(5, n))
+            codecopy(a, codesize(), shl(5, add(n, 1)))
         }
     }
 
