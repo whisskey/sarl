@@ -6,10 +6,6 @@ import { Array, DynamicArrayLib } from "src/libraries/DynamicArrayLib.sol";
 import { SarlTest } from "test/utils/SarlTest.sol";
 
 contract DynamicArrayLibTest is SarlTest {
-    error outOfBounds();
-    error invalidRange();
-    error emptyArray();
-
     function setUp() public { }
 
     function test_create() public pure {

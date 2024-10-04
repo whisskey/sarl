@@ -8,10 +8,6 @@ import { SarlTest } from "test/utils/SarlTest.sol";
 contract ArrayLibTest is SarlTest {
     using ArrayLib for uint256[];
 
-    error outOfBounds();
-    error invalidRange();
-    error emptyArray();
-
     function setUp() public { }
 
     function test_malloc() public pure {

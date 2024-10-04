@@ -8,9 +8,6 @@ import { SarlTest } from "test/utils/SarlTest.sol";
 contract UnsafeLibTest is SarlTest {
     using UnsafeLib for Array;
 
-    error outOfBounds();
-    error invalidRange();
-
     function setUp() public { }
 
     function test_unsafePtr() public pure {
@@ -436,7 +433,7 @@ contract UnsafeLibTest is SarlTest {
         }
     }
 
-    function test_unsafeFlipCustomArr() public pure {
+    function test_unsafeWrap() public pure {
         unchecked {
             uint256 length = 6;
             uint256[] memory b = new uint256[](length);
@@ -447,10 +444,61 @@ contract UnsafeLibTest is SarlTest {
             b[4] = 5;
             b[5] = 6;
 
-            Array arr = UnsafeLib.unsafe_flipCustomArr(b);
+            Array arr = UnsafeLib.unsafe_wrap(b);
 
             for (uint256 i; i != length; ++i) {
                 assertEq(arr.get(i), b[i]);
+            }
+
+            assertEq(arr.limit(), length);
+            assertEq(arr.length(), length);
+        }
+    }
+
+    function test_unsafeWrap_address() public pure {
+        unchecked {
+            uint256 length = 1;
+            address[] memory b = new address[](length);
+            b[0] = vm.addr(1);
+
+            Array arr = UnsafeLib.unsafe_wrap(b);
+
+            for (uint256 i; i != length; ++i) {
+                assertEq(arr.getAddress(i), b[i]);
+            }
+
+            assertEq(arr.limit(), length);
+            assertEq(arr.length(), length);
+        }
+    }
+
+    function test_unsafeWrap_bool() public view {
+        unchecked {
+            uint256 length = 1;
+            bool[] memory b = new bool[](length);
+            b[0] = vm.isPersistent(address(0x1));
+
+            Array arr = UnsafeLib.unsafe_wrap(b);
+
+            for (uint256 i; i != length; ++i) {
+                assertEq(arr.getBool(i), b[i]);
+            }
+
+            assertEq(arr.limit(), length);
+            assertEq(arr.length(), length);
+        }
+    }
+
+    function test_unsafeWrap_bytes32() public pure {
+        unchecked {
+            uint256 length = 1;
+            bytes32[] memory b = new bytes32[](length);
+            b[0] = keccak256("sarl");
+
+            Array arr = UnsafeLib.unsafe_wrap(b);
+
+            for (uint256 i; i != length; ++i) {
+                assertEq(arr.getBytes32(i), b[i]);
             }
 
             assertEq(arr.limit(), length);
