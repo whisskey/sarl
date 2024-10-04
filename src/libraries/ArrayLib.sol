@@ -104,7 +104,7 @@ library ArrayLib {
     /// @param a The array to be resized.
     /// @param n The new length for the array.
     /// @return result The resized array, or the original array if `n` exceeds the current length.
-    function resize(uint256[] memory a, uint256 n) internal pure returns (uint256[] memory result) {
+    function trimSize(uint256[] memory a, uint256 n) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
             result := a
             // If the new size (n) is less than the current length, set it to n; otherwise, keep the current length
