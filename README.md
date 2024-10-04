@@ -1,6 +1,6 @@
 <div align="center">
   <img src="logo.svg" alt="sarl" height="250" />
-
+  <br>
   <a href="https://soldeer.xyz/project/sarl">
     <img src="https://img.shields.io/badge/soldeer-0.3.0-blue">
   </a>
