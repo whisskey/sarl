@@ -26,8 +26,9 @@ library UnsafeLib {
 
     /// @dev Clears the array by resetting its length to zero.
     /// @param a The pointer to the array in memory.
-    function unsafe_clear(Array a) internal pure {
+    function unsafe_clear(Array a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             // Clear the array by setting the length to 0 while preserving the limit
             mstore(a, and(mload(a), not(sub(shl(128, 1), 1))))
         }
@@ -36,8 +37,9 @@ library UnsafeLib {
     /// @dev Resizes the array to a specified length.
     /// @param a The pointer to the array in memory.
     /// @param n The new length of the array.
-    function unsafe_resize(Array a, uint256 n) internal pure {
+    function unsafe_resize(Array a, uint256 n) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             // Update the length of the array to the new size n
             mstore(a, or(shl(128, shr(128, mload(a))), n))
         }
@@ -50,8 +52,9 @@ library UnsafeLib {
     /// @notice This function should only be used when you are certain that the index is valid.
     /// Using an out-of-bounds index can lead to undefined behavior.
     /// While marked as memory safe, it may not be safe if the calling contract violates safety guarantees.
-    function unsafe_set(Array a, uint256 i, uint256 e) internal pure {
+    function unsafe_set(Array a, uint256 i, uint256 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             // Store the element e at the specified index i in the array a
             mstore(add(a, shl(5, add(0x01, i))), e)
         }
@@ -61,8 +64,9 @@ library UnsafeLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the address value.
     /// @param e The address value to set at the specified index.
-    function unsafe_set(Array a, uint256 i, address e) internal pure {
+    function unsafe_set(Array a, uint256 i, address e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             mstore(add(a, shl(5, add(0x01, i))), shr(96, shl(96, e)))
         }
     }
@@ -71,8 +75,9 @@ library UnsafeLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the boolean value.
     /// @param e The boolean value to set at the specified index.
-    function unsafe_set(Array a, uint256 i, bool e) internal pure {
+    function unsafe_set(Array a, uint256 i, bool e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             mstore(add(a, shl(5, add(0x01, i))), iszero(iszero(e)))
         }
     }
@@ -81,8 +86,9 @@ library UnsafeLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the bytes32 value.
     /// @param e The bytes32 value to set at the specified index.
-    function unsafe_set(Array a, uint256 i, bytes32 e) internal pure {
+    function unsafe_set(Array a, uint256 i, bytes32 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             mstore(add(a, shl(5, add(0x01, i))), e)
         }
     }
@@ -157,7 +163,7 @@ library UnsafeLib {
     function unsafe_popUint256(Array a) internal pure returns (uint256 result) {
         assembly ("memory-safe") {
             let n := and(mload(a), sub(shl(128, 1), 1))
-            result := mload(add(a, add(a, shl(5, n))))
+            result := mload(add(a, shl(5, n)))
             mstore(a, or(shl(128, shr(128, mload(a))), sub(n, iszero(iszero(n)))))
         }
     }
@@ -168,7 +174,7 @@ library UnsafeLib {
     function unsafe_popAddress(Array a) internal pure returns (address result) {
         assembly ("memory-safe") {
             let n := and(mload(a), sub(shl(128, 1), 1))
-            result := mload(add(a, add(a, shl(5, n))))
+            result := mload(add(a, shl(5, n)))
             mstore(a, or(shl(128, shr(128, mload(a))), sub(n, iszero(iszero(n)))))
         }
     }
@@ -179,7 +185,7 @@ library UnsafeLib {
     function unsafe_popBool(Array a) internal pure returns (bool result) {
         assembly ("memory-safe") {
             let n := and(mload(a), sub(shl(128, 1), 1))
-            result := mload(add(a, add(a, shl(5, n))))
+            result := mload(add(a, shl(5, n)))
             mstore(a, or(shl(128, shr(128, mload(a))), sub(n, iszero(iszero(n)))))
         }
     }
@@ -190,7 +196,7 @@ library UnsafeLib {
     function unsafe_popBytes32(Array a) internal pure returns (bytes32 result) {
         assembly ("memory-safe") {
             let n := and(mload(a), sub(shl(128, 1), 1))
-            result := mload(add(a, add(a, shl(5, n))))
+            result := mload(add(a, shl(5, n)))
             mstore(a, or(shl(128, shr(128, mload(a))), sub(n, iszero(iszero(n)))))
         }
     }
@@ -296,8 +302,9 @@ library UnsafeLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index of the first element to swap.
     /// @param j The index of the second element to swap.
-    function unsafe_swap(Array a, uint256 i, uint256 j) internal pure {
+    function unsafe_swap(Array a, uint256 i, uint256 j) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             // Load value at index i into temp
             let tmp := mload(add(a, shl(5, add(0x01, i))))
             mstore(add(a, shl(5, add(0x01, i))), mload(add(a, shl(5, add(0x01, j)))))
@@ -309,8 +316,9 @@ library UnsafeLib {
     /// one.
     /// @param a The array from which to remove the element.
     /// @param i The index of the element to remove.
-    function unsafe_removeCheap(Array a, uint256 i) internal pure {
+    function unsafe_removeCheap(Array a, uint256 i) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), sub(shl(128, 1), 1))
             // Calculate the new length
             let li := sub(n, 1)
@@ -327,8 +335,9 @@ library UnsafeLib {
     /// @dev Removes an element at the specified index from the array.
     /// @param a The pointer to the array in memory.
     /// @param i The index of the element to remove.
-    function unsafe_removeExpensive(Array a, uint256 i) internal pure {
+    function unsafe_removeExpensive(Array a, uint256 i) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), sub(shl(128, 1), 1))
             // Calculate the address of the element to be removed
             let ptr := add(a, shl(5, add(0x01, i)))
@@ -365,7 +374,7 @@ library UnsafeLib {
     /// @dev Converts a standard `uint256[]` memory array into a custom array structure (`Array`)
     /// @param a The standard `uint256[]` memory array to convert.
     /// @return arr The converted custom `Array` structure with the length and limit set.
-    function unsafe_flipCustomArrShl(uint256[] memory a) internal pure returns (Array arr) {
+    function unsafe_flipCustomArr(uint256[] memory a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
             arr := a
             let n := mload(a)
@@ -401,8 +410,9 @@ library UnsafeLib {
     /// @dev Concatenates two arrays into the first array.
     /// @param a The first array that will receive elements from the second array.
     /// @param b The second array whose elements will be appended to the first array.
-    function unsafe_concat(Array a, Array b) internal pure {
+    function unsafe_concat(Array a, Array b) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let m := sub(shl(128, 1), 1)
             let na := and(mload(a), m)
             let nb := and(mload(b), m)
