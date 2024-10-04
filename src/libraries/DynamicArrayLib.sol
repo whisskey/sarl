@@ -141,7 +141,7 @@ library DynamicArrayLib {
             // Last 128 bits: limit
             let lmt := shr(128, data)
             // Size
-            let s := add(shl(5, n), 0x20)
+            let s := add(shl(5, lmt), 0x20)
             let fmp := mload(0x40)
             // Is the new limit smaller than the current limit?
             switch lt(newLmt, lmt)
@@ -190,8 +190,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, uint256 e) internal pure {
+    function set(Array a, uint256 i, uint256 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             // First 128 bits: length
             let n := and(data, MASK_128)
@@ -217,8 +218,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, address e) internal pure {
+    function set(Array a, uint256 i, address e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             let n := and(data, MASK_128)
             let lmt := shr(128, data)
@@ -242,8 +244,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, bool e) internal pure {
+    function set(Array a, uint256 i, bool e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             let n := and(data, MASK_128)
             let lmt := shr(128, data)
@@ -267,8 +270,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, bytes32 e) internal pure {
+    function set(Array a, uint256 i, bytes32 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             let n := and(data, MASK_128)
             let lmt := shr(128, data)
@@ -570,12 +574,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -592,12 +596,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -614,12 +618,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -636,12 +640,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -658,12 +662,12 @@ library DynamicArrayLib {
             // Word mask
             let w := not(0x1f)
             for { let o := bytesN } 1 { } {
+                if iszero(o) { break }
                 // Copy word from the original array to the result array
                 mstore(add(result, o), mload(add(a, o)))
                 o := add(o, w) // Move to the next word
-                if iszero(o) { break }
             }
-            mstore(0x40, add(result, shl(5, add(n, 1))))
+            mstore(0x40, add(result, add(bytesN, 0x20)))
         }
     }
 
@@ -671,11 +675,11 @@ library DynamicArrayLib {
     /// @param a The `Array` in which elements will be swapped.
     /// @param i The index of the first element to swap.
     /// @param j The index of the second element to swap.
-    function swap(Array a, uint256 i, uint256 j) internal pure {
+    function swap(Array a, uint256 i, uint256 j) internal pure returns (Array arr) {
         assembly ("memory-safe") {
-            // Last valid index
-            let li := sub(and(mload(a), MASK_128), 1)
-            if or(gt(i, li), gt(j, li)) {
+            arr := a
+            let n := and(mload(a), MASK_128)
+            if or(iszero(lt(i, n)), iszero(lt(j, n))) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
@@ -694,8 +698,9 @@ library DynamicArrayLib {
     /// Quicksort is generally more efficient for large arrays, but insertion sort
     /// is more effective for smaller arrays due to fewer comparisons and swaps.
     /// @param a The pointer to the array in memory.
-    function insertionSort(Array a) internal pure {
+    function insertionSort(Array a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             // Calculate the end pointer for the array
             let ep := add(a, shl(5, n))
@@ -732,8 +737,9 @@ library DynamicArrayLib {
     /// This method is efficient for cases where the order of elements is not important.
     /// @param a The pointer to the array in memory.
     /// @param i The index of the element to be removed.
-    function removeCheap(Array a, uint256 i) internal pure {
+    function removeCheap(Array a, uint256 i) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             if iszero(lt(i, n)) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
@@ -760,8 +766,9 @@ library DynamicArrayLib {
     /// shifting elements, making it less efficient than other removal methods.
     /// @param a The pointer to the array in memory.
     /// @param i The index of the element to be removed.
-    function removeExpensive(Array a, uint256 i) internal pure {
+    function removeExpensive(Array a, uint256 i) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             if iszero(lt(i, n)) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
@@ -788,8 +795,9 @@ library DynamicArrayLib {
 
     /// @dev Reverses the elements of the array in place.
     /// @param a The pointer to the array in memory that will be reversed.
-    function reverse(Array a) internal pure {
+    function reverse(Array a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             if iszero(lt(n, 2)) {
                 // Calculate the starting pointer
@@ -821,19 +829,18 @@ library DynamicArrayLib {
     /// @return f A boolean indicating whether the value was found (true) or not (false).
     function unSortedSearch(Array a, uint256 e) internal pure returns (uint256 i, bool f) {
         assembly ("memory-safe") {
-            let b := add(a, 0x20)
             // Address of the element just past the last element in the array
-            let ep := add(b, shl(5, and(mload(a), MASK_128)))
-            let t := b
+            let ep := add(a, shl(5, and(mload(a), MASK_128)))
+            let t := a
             for { } 1 { } {
-                if gt(t, ep) { break }
-                // If a match is found, calculate the index
+                t := add(t, 0x20)
                 if eq(mload(t), e) {
-                    i := shr(5, sub(t, b))
+                    // If a match is found, calculate the index
+                    i := shr(5, sub(t, add(a, 0x20)))
                     f := 1
                     break
                 }
-                t := add(t, 0x20)
+                if iszero(lt(t, ep)) { break }
             }
         }
     }
@@ -872,16 +879,83 @@ library DynamicArrayLib {
             f := eq(t, e)
             // Check if index i is non-zero
             t := iszero(iszero(i))
-            i := mul(add(i, w), t)
-            // If the element was found, update the found status
-            f := and(f, t)
+            i := mul(add(i, w), and(t, f))
         }
     }
 
     /// @dev Converts a standard `uint256[]` array into a custom `Array` format.
     /// @param a The standard `uint256[]` array to be converted.
     /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
-    function flipCustomArr(uint256[] memory a) internal pure returns (Array arr) {
+    function wrap(uint256[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := mload(0x40)
+            let n := mload(a)
+            // Calculate the byte size of the length
+            let bytesN := shl(5, n)
+            // Update the length and limit in the custom array
+            mstore(arr, or(shl(128, n), n))
+            // Mask
+            let w := not(0x1f)
+            for { let o := bytesN } 1 { } {
+                mstore(add(arr, o), mload(add(a, o)))
+                // Move to the next word
+                o := add(o, w)
+                if iszero(o) { break }
+            }
+            mstore(0x40, add(arr, shl(5, add(n, 1))))
+        }
+    }
+
+    /// @dev Converts a standard `address[]` array into a custom `Array` format.
+    /// @param a The standard `address[]` array to be converted.
+    /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
+    function wrap(address[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := mload(0x40)
+            let n := mload(a)
+            // Calculate the byte size of the length
+            let bytesN := shl(5, n)
+            // Update the length and limit in the custom array
+            mstore(arr, or(shl(128, n), n))
+            // Mask
+            let w := not(0x1f)
+            for { let o := bytesN } 1 { } {
+                mstore(add(arr, o), mload(add(a, o)))
+                // Move to the next word
+                o := add(o, w)
+                if iszero(o) { break }
+            }
+            mstore(0x40, add(arr, shl(5, add(n, 1))))
+        }
+    }
+
+    /// @dev Converts a standard `bool[]` array into a custom `Array` format.
+    /// @param a The standard `bool[]` array to be converted.
+    /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
+    function wrap(bool[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := mload(0x40)
+            let n := mload(a)
+            // Calculate the byte size of the length
+            let bytesN := shl(5, n)
+            // Update the length and limit in the custom array
+            mstore(arr, or(shl(128, n), n))
+            // Mask
+            let w := not(0x1f)
+            for { let o := bytesN } 1 { } {
+                mstore(add(arr, o), mload(add(a, o)))
+                // Move to the next word
+                o := add(o, w)
+                if iszero(o) { break }
+            }
+            mstore(0x40, add(arr, shl(5, add(n, 1))))
+        }
+    }
+
+    /// @dev Converts a standard `bytes32[]` array into a custom `Array` format.
+    /// @param a The standard `bytes32[]` array to be converted.
+    /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
+    function wrap(bytes32[] memory a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
             arr := mload(0x40)
             let n := mload(a)
@@ -909,9 +983,9 @@ library DynamicArrayLib {
     function slice(Array a, uint256 s, uint256 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
             arr := mload(0x40)
-            let li := sub(and(mload(a), MASK_128), 1)
-            if or(gt(s, li), or(gt(e, li), gt(s, e))) {
-                mstore(0x00, 0xa8834357) // "InvalidBounds"
+            let n := and(mload(a), MASK_128)
+            if or(or(iszero(lt(s, n)), iszero(lt(e, n))), iszero(lt(s, e))) {
+                mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
             // Calculate the length of the slice
@@ -947,20 +1021,18 @@ library DynamicArrayLib {
             mstore(arr, or(shl(128, tn), tn))
             // Byte size of array 'a'
             let bytesNa := shl(5, na)
-            // Byte size of array 'b'
-            let bytesNb := shl(5, nb)
             // Mask
             let w := not(0x1f)
             for { let o := bytesNa } 1 { } {
+                if iszero(o) { break }
                 mstore(add(arr, o), mload(add(a, o)))
                 // Move backwards through the byte array
                 o := add(o, w)
-                if iszero(o) { break }
             }
-            for { let o := bytesNb } 1 { } {
+            for { let o := shl(5, nb) } 1 { } {
+                if iszero(o) { break }
                 mstore(add(add(arr, bytesNa), o), mload(add(b, o)))
                 o := add(o, w)
-                if iszero(o) { break }
             }
             // Update the free memory pointer to point after the new concatenated array
             mstore(0x40, add(arr, shl(5, add(tn, 1))))
