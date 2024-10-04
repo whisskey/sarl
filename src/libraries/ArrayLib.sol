@@ -15,8 +15,6 @@ library ArrayLib {
 
     /// @notice Thrown when an index is out of bounds.
     error OutOfBounds();
-    /// @notice Thrown when the provided bounds are invalid.
-    error InvalidBounds();
 
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
     /*                      UINT256 OPERATIONS                      */
@@ -112,24 +110,29 @@ library ArrayLib {
         }
     }
 
+    /// @notice This function does not perform bound checking, meaning
+    /// that if `i` is greater than or equal to the array's length,
+    /// it may result in unexpected behavior, memory corruption, or out-of-bounds errors.
     /// @dev Sets the element at index `i` in the array `a` to the value `e`.
     /// @param a The array in which the element will be set.
     /// @param i The index at which the value will be set.
     /// @param e The value to set at the specified index.
-    function set(uint256[] memory a, uint256 i, uint256 e) internal pure {
+    function set(uint256[] memory a, uint256 i, uint256 e) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
-            if gt(i, mload(a)) { revert(0x00, 0x00) }
+            result := a
             mstore(add(a, shl(5, add(0x01, i))), e)
         }
     }
 
+    /// @notice This function does not perform bound checking, meaning
+    /// that if `i` is greater than or equal to the array's length,
+    /// it may result in unexpected behavior, memory corruption, or out-of-bounds errors.
     /// @dev Returns the element at index `i` from the array `a`.
     /// @param a The array from which to retrieve the element.
     /// @param i The index of the element to retrieve.
     /// @return result The element at the specified index.
     function get(uint256[] memory a, uint256 i) internal pure returns (uint256 result) {
         assembly ("memory-safe") {
-            if gt(i, mload(a)) { revert(0x00, 0x00) }
             result := mload(add(a, shl(5, add(0x01, i))))
         }
     }
