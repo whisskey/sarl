@@ -886,7 +886,76 @@ library DynamicArrayLib {
     /// @dev Converts a standard `uint256[]` array into a custom `Array` format.
     /// @param a The standard `uint256[]` array to be converted.
     /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
-    function flipCustomArr(uint256[] memory a) internal pure returns (Array arr) {
+    function wrap(uint256[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := mload(0x40)
+            let n := mload(a)
+            // Calculate the byte size of the length
+            let bytesN := shl(5, n)
+            // Update the length and limit in the custom array
+            mstore(arr, or(shl(128, n), n))
+            // Mask
+            let w := not(0x1f)
+            for { let o := bytesN } 1 { } {
+                mstore(add(arr, o), mload(add(a, o)))
+                // Move to the next word
+                o := add(o, w)
+                if iszero(o) { break }
+            }
+            mstore(0x40, add(arr, shl(5, add(n, 1))))
+        }
+    }
+
+    /// @dev Converts a standard `address[]` array into a custom `Array` format.
+    /// @param a The standard `address[]` array to be converted.
+    /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
+    function wrap(address[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := mload(0x40)
+            let n := mload(a)
+            // Calculate the byte size of the length
+            let bytesN := shl(5, n)
+            // Update the length and limit in the custom array
+            mstore(arr, or(shl(128, n), n))
+            // Mask
+            let w := not(0x1f)
+            for { let o := bytesN } 1 { } {
+                mstore(add(arr, o), mload(add(a, o)))
+                // Move to the next word
+                o := add(o, w)
+                if iszero(o) { break }
+            }
+            mstore(0x40, add(arr, shl(5, add(n, 1))))
+        }
+    }
+
+    /// @dev Converts a standard `bool[]` array into a custom `Array` format.
+    /// @param a The standard `bool[]` array to be converted.
+    /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
+    function wrap(bool[] memory a) internal pure returns (Array arr) {
+        assembly ("memory-safe") {
+            arr := mload(0x40)
+            let n := mload(a)
+            // Calculate the byte size of the length
+            let bytesN := shl(5, n)
+            // Update the length and limit in the custom array
+            mstore(arr, or(shl(128, n), n))
+            // Mask
+            let w := not(0x1f)
+            for { let o := bytesN } 1 { } {
+                mstore(add(arr, o), mload(add(a, o)))
+                // Move to the next word
+                o := add(o, w)
+                if iszero(o) { break }
+            }
+            mstore(0x40, add(arr, shl(5, add(n, 1))))
+        }
+    }
+
+    /// @dev Converts a standard `bool[]` array into a custom `Array` format.
+    /// @param a The standard `bool[]` array to be converted.
+    /// @return arr A custom `Array` formatted as an `Array` type with the same elements as the input.
+    function wrap(bytes32[] memory a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
             arr := mload(0x40)
             let n := mload(a)
