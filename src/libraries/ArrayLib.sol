@@ -310,19 +310,18 @@ library ArrayLib {
     /// @return f A boolean indicating whether the element was found (true) or not (false).
     function unSortedSearch(uint256[] memory a, uint256 e) internal pure returns (uint256 i, bool f) {
         assembly ("memory-safe") {
-            let b := add(a, 0x20)
             // Address of the element just past the last element in the array
-            let ep := add(b, shl(5, mload(a)))
-            let t := b
+            let ep := add(a, shl(5, mload(a)))
+            let t := a
             for { } 1 { } {
-                if gt(t, ep) { break }
+                t := add(t, 0x20)
                 if eq(mload(t), e) {
                     // If a match is found, calculate the index
-                    i := shr(5, sub(t, b))
+                    i := shr(5, sub(t, add(a, 0x20)))
                     f := 1
                     break
                 }
-                t := add(t, 0x20)
+                if iszero(lt(t, ep)) { break }
             }
         }
     }
@@ -359,9 +358,7 @@ library ArrayLib {
             f := eq(t, e)
             // Check if index i is non-zero
             t := iszero(iszero(i))
-            i := mul(add(i, w), t)
-            // If the element was found, update the found status
-            f := and(f, t)
+            i := mul(add(i, w), and(t, f))
         }
     }
 
