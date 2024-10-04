@@ -876,9 +876,7 @@ library DynamicArrayLib {
             f := eq(t, e)
             // Check if index i is non-zero
             t := iszero(iszero(i))
-            i := mul(add(i, w), t)
-            // If the element was found, update the found status
-            f := and(f, t)
+            i := mul(add(i, w), and(t, f))
         }
     }
 
