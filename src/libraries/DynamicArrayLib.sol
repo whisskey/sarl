@@ -190,8 +190,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, uint256 e) internal pure {
+    function set(Array a, uint256 i, uint256 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             // First 128 bits: length
             let n := and(data, MASK_128)
@@ -217,8 +218,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, address e) internal pure {
+    function set(Array a, uint256 i, address e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             let n := and(data, MASK_128)
             let lmt := shr(128, data)
@@ -242,8 +244,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, bool e) internal pure {
+    function set(Array a, uint256 i, bool e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             let n := and(data, MASK_128)
             let lmt := shr(128, data)
@@ -267,8 +270,9 @@ library DynamicArrayLib {
     /// @param a The pointer to the array in memory.
     /// @param i The index at which to set the value.
     /// @param e The value to set at the specified index.
-    function set(Array a, uint256 i, bytes32 e) internal pure {
+    function set(Array a, uint256 i, bytes32 e) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let data := mload(a)
             let n := and(data, MASK_128)
             let lmt := shr(128, data)
@@ -671,11 +675,11 @@ library DynamicArrayLib {
     /// @param a The `Array` in which elements will be swapped.
     /// @param i The index of the first element to swap.
     /// @param j The index of the second element to swap.
-    function swap(Array a, uint256 i, uint256 j) internal pure {
+    function swap(Array a, uint256 i, uint256 j) internal pure returns (Array arr) {
         assembly ("memory-safe") {
-            // Last valid index
-            let li := sub(and(mload(a), MASK_128), 1)
-            if or(gt(i, li), gt(j, li)) {
+            arr := a
+            let n := and(mload(a), MASK_128)
+            if or(iszero(lt(i, n)), iszero(lt(j, n))) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
@@ -694,8 +698,9 @@ library DynamicArrayLib {
     /// Quicksort is generally more efficient for large arrays, but insertion sort
     /// is more effective for smaller arrays due to fewer comparisons and swaps.
     /// @param a The pointer to the array in memory.
-    function insertionSort(Array a) internal pure {
+    function insertionSort(Array a) internal pure returns (Array arr) {
         assembly ("memory-safe") {
+            arr := a
             let n := and(mload(a), MASK_128)
             // Calculate the end pointer for the array
             let ep := add(a, shl(5, n))
