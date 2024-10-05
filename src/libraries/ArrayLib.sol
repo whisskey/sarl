@@ -15,8 +15,6 @@ library ArrayLib {
 
     /// @notice Thrown when an index is out of bounds.
     error OutOfBounds();
-    /// @notice Thrown when the provided bounds are invalid.
-    error InvalidBounds();
 
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
     /*                      UINT256 OPERATIONS                      */
@@ -70,13 +68,12 @@ library ArrayLib {
                         staticcall(
                             gas(),
                             0x04, // `identity` precompile
-                            a, // Source address
-                            s, // Source length
-                            fmp, // Destination memory pointer
-                            s // Destination length
+                            a,
+                            s,
+                            fmp,
+                            s
                         )
                     )
-                    // Set the length and elements of the array in the new memory
                     mstore(fmp, newSize)
                     result := fmp
                     mstore(0x40, add(fmp, add(s, shl(5, sub(newSize, n)))))
@@ -96,7 +93,7 @@ library ArrayLib {
             let fmp := mload(0x40)
             // If equal, write the array's starting address to 0x40; otherwise, keep the current free pointer
             mstore(0x40, or(mul(eq(fmp, s), a), mul(iszero(eq(fmp, s)), fmp)))
-            codecopy(a, codesize(), shl(5, n))
+            codecopy(a, codesize(), shl(5, add(n, 1)))
         }
     }
 
@@ -104,32 +101,37 @@ library ArrayLib {
     /// @param a The array to be resized.
     /// @param n The new length for the array.
     /// @return result The resized array, or the original array if `n` exceeds the current length.
-    function resize(uint256[] memory a, uint256 n) internal pure returns (uint256[] memory result) {
+    function trimSize(uint256[] memory a, uint256 n) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
             result := a
             // If the new size (n) is less than the current length, set it to n; otherwise, keep the current length
-            mstore(a, or(mul(lt(n, mload(a)), n), mload(a)))
+            mstore(a, or(mul(lt(n, mload(a)), n), mul(iszero(lt(n, mload(a))), mload(a))))
         }
     }
 
+    /// @notice This function does not perform bound checking, meaning
+    /// that if `i` is greater than or equal to the array's length,
+    /// it may result in unexpected behavior, memory corruption, or out-of-bounds errors.
     /// @dev Sets the element at index `i` in the array `a` to the value `e`.
     /// @param a The array in which the element will be set.
     /// @param i The index at which the value will be set.
     /// @param e The value to set at the specified index.
-    function set(uint256[] memory a, uint256 i, uint256 e) internal pure {
+    function set(uint256[] memory a, uint256 i, uint256 e) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
-            if gt(i, mload(a)) { revert(0x00, 0x00) }
+            result := a
             mstore(add(a, shl(5, add(0x01, i))), e)
         }
     }
 
+    /// @notice This function does not perform bound checking, meaning
+    /// that if `i` is greater than or equal to the array's length,
+    /// it may result in unexpected behavior, memory corruption, or out-of-bounds errors.
     /// @dev Returns the element at index `i` from the array `a`.
     /// @param a The array from which to retrieve the element.
     /// @param i The index of the element to retrieve.
     /// @return result The element at the specified index.
     function get(uint256[] memory a, uint256 i) internal pure returns (uint256 result) {
         assembly ("memory-safe") {
-            if gt(i, mload(a)) { revert(0x00, 0x00) }
             result := mload(add(a, shl(5, add(0x01, i))))
         }
     }
@@ -162,9 +164,8 @@ library ArrayLib {
     function swap(uint256[] memory a, uint256 i, uint256 j) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
             result := a
-            // Get the length of the array and subtract 1
-            let li := sub(mload(a), 1)
-            if or(gt(i, li), gt(j, li)) {
+            let n := mload(a)
+            if or(iszero(lt(i, n)), iszero(lt(j, n))) {
                 mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
@@ -311,19 +312,18 @@ library ArrayLib {
     /// @return f A boolean indicating whether the element was found (true) or not (false).
     function unSortedSearch(uint256[] memory a, uint256 e) internal pure returns (uint256 i, bool f) {
         assembly ("memory-safe") {
-            let b := add(a, 0x20)
             // Address of the element just past the last element in the array
-            let ep := add(b, shl(5, mload(a)))
-            let t := b
+            let ep := add(a, shl(5, mload(a)))
+            let t := a
             for { } 1 { } {
-                if gt(t, ep) { break }
+                t := add(t, 0x20)
                 if eq(mload(t), e) {
                     // If a match is found, calculate the index
-                    i := shr(5, sub(t, b))
+                    i := shr(5, sub(t, add(a, 0x20)))
                     f := 1
                     break
                 }
-                t := add(t, 0x20)
+                if iszero(lt(t, ep)) { break }
             }
         }
     }
@@ -360,9 +360,7 @@ library ArrayLib {
             f := eq(t, e)
             // Check if index i is non-zero
             t := iszero(iszero(i))
-            i := mul(add(i, w), t)
-            // If the element was found, update the found status
-            f := and(f, t)
+            i := mul(add(i, w), and(t, f))
         }
     }
 
@@ -374,9 +372,9 @@ library ArrayLib {
     function slice(uint256[] memory a, uint256 s, uint256 e) internal pure returns (uint256[] memory result) {
         assembly ("memory-safe") {
             result := mload(0x40)
-            let li := sub(mload(a), 1)
-            if or(gt(s, li), or(gt(e, li), gt(s, e))) {
-                mstore(0x00, 0xa8834357) // "InvalidBounds"
+            let n := mload(a)
+            if or(or(iszero(lt(s, n)), iszero(lt(e, n))), iszero(lt(s, e))) {
+                mstore(0x00, 0xb4120f14) // "OutOfBounds"
                 revert(0x1c, 0x04)
             }
             // Calculate the length of the slice
@@ -412,20 +410,18 @@ library ArrayLib {
             mstore(result, tn)
             // Byte size of array 'a'
             let bytesNa := shl(5, na)
-            // Byte size of array 'b'
-            let bytesNb := shl(5, nb)
             // Mask
             let w := not(0x1f)
             for { let o := bytesNa } 1 { } {
+                if iszero(o) { break }
                 mstore(add(result, o), mload(add(a, o)))
                 // Move backwards through the byte array
                 o := add(o, w)
-                if iszero(o) { break }
             }
-            for { let o := bytesNb } 1 { } {
+            for { let o := shl(5, nb) } 1 { } {
+                if iszero(o) { break }
                 mstore(add(add(result, bytesNa), o), mload(add(b, o)))
                 o := add(o, w)
-                if iszero(o) { break }
             }
             // Update the free memory pointer to point after the new concatenated array
             mstore(0x40, add(result, shl(5, add(tn, 1))))
