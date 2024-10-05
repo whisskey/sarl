@@ -22,7 +22,7 @@ SARL is an optimized set of libraries for dynamic array management in Solidity. 
 To use SARL in your project, you can install it via the Solidity package manager or simply include the libraries in your repository:
 
 ```
-forge soldeer install sarl~1.0.0
+forge soldeer install sarl~0.1.0
 ```
 
 ## Libraries
