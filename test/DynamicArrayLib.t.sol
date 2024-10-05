@@ -1059,17 +1059,16 @@ contract DynamicArrayLibTest is SarlTest {
     /*&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%&&%+&/%*/
 
     function _checkMemory(Array a) internal pure {
-        bool insufficientMalloc;
+        bool insufMalloc;
+
         assembly ("memory-safe") {
-            // Write ones to the free memory, to make subsequent checks fail if
-            // insufficient memory is allocated.
             mstore(mload(0x40), not(0))
-            // Check if the memory allocated is sufficient.
-            insufficientMalloc := gt(add(add(a, 0x20), shl(5, shr(128, mload(a)))), mload(0x40))
+            // Calculate the total size required for the array and compare it to the current free memory pointer.
+            insufMalloc := gt(add(add(a, 0x20), shl(5, shr(128, mload(a)))), mload(0x40))
         }
-        if (insufficientMalloc) {
-            revert("Insufficient memory allocation!");
-        }
+
+        require(!insufMalloc, InsufficientMemory());
+
         _checkMemory();
     }
 }
