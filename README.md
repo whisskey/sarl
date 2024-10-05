@@ -117,7 +117,7 @@ It's essential that you run your own thorough tests when integrating SARL into y
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request. Make sure to follow the contribution guidelines in the CONTRIBUTING.md file.
+Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request. Make sure to follow the contribution guidelines in the [CONTRIBUTING](./CONTRIBUTING.md) file.
 
 ## License
 
