@@ -68,13 +68,12 @@ library ArrayLib {
                         staticcall(
                             gas(),
                             0x04, // `identity` precompile
-                            a, // Source address
-                            s, // Source length
-                            fmp, // Destination memory pointer
-                            s // Destination length
+                            a,
+                            s,
+                            fmp,
+                            s
                         )
                     )
-                    // Set the length and elements of the array in the new memory
                     mstore(fmp, newSize)
                     result := fmp
                     mstore(0x40, add(fmp, add(s, shl(5, sub(newSize, n)))))
